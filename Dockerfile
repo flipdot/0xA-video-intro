@@ -25,6 +25,8 @@ RUN TERM=dumb \
 
 RUN git clone https://github.com/3b1b/manim /manim
 
+COPY manimlib/ /manim/manimlib/
+
 RUN cd /manim \
 	&& git checkout 0.1.10 \
 	&& sed -i 's/TEX_USE_CTEX = False/TEX_USE_CTEX = True/g' /manim/manimlib/constants.py \

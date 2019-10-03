@@ -7,8 +7,6 @@ import random
 from textwrap import dedent
 from collections import namedtuple
 import urllib.parse
-from multiprocessing import Pool
-from multiprocessing import cpu_count
 
 Talk = namedtuple('Talk', ['speaker', 'title', 'seed'])
 
@@ -29,39 +27,37 @@ def sanitize_file_name(file_name: str) -> str:
     '''
     return re.sub('[^\w\-_\. ]', '_', file_name)
 
-
-def render_talk(p):
-    speaker, title, seed = p
-
-    env = os.environ.copy()
-    env['TALK_CONFERENCE'] = 'hackumenta'
-    env['TALK_SPEAKER'] = speaker
-    env['TALK_TITLE'] = title
-    env['SEED'] = str(seed) if seed is not None else str(random.randint(0, 1000000))
-
-    file_name_title = title.replace(' ', '.')
-    file_name = sanitize_file_name(f'{speaker}-{file_name_title}-{env["SEED"]}.mp4')
-
-    print(f'Rendering: {speaker}_{title}')
-
-    p = subprocess.Popen([
-            'manim',
-            '--file_name', file_name,
-            '-r', '1080,1920',
-            '0xa.py',
-            'Intro',
-        ],
-        env=env,
-    )
-    p.wait()
-    return (Talk(speaker, title, seed), file_name)
-
 def render_talks(talks):
-    pool = Pool(cpu_count())
-    files = pool.map(render_talk, TALKS)
-    pool.close()
-    pool.join()
+    files = []
+    counter = 0
+    for speaker, title, seed in TALKS:
+        counter += 1
+        print(f'Rendering {counter}/{len(TALKS)}')
+
+        env = os.environ.copy()
+        env['TALK_CONFERENCE'] = 'hackumenta'
+        env['TALK_SPEAKER'] = speaker
+        env['TALK_TITLE'] = title
+        env['SEED'] = str(seed) if seed is not None else str(random.randint(0, 1000000))
+
+        file_name_title = title.replace(' ', '.')
+        file_name = sanitize_file_name(f'{speaker}-{file_name_title}-{env["SEED"]}.mp4')
+
+        print(f'Rendering: {speaker}_{title}')
+
+        p = subprocess.Popen([
+                'manim',
+                '--file_name', file_name,
+                '-r', '1080,1920',
+                '0xa.py',
+                'Intro',
+            ],
+            env=env,
+        )
+        p.wait()
+        files.append((Talk(speaker, title, seed), file_name))
     return files
+
 
 def main():
     files = render_talks(TALKS)

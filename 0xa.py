@@ -1,3 +1,5 @@
+import pathlib
+
 from manimlib.imports import *
 from manimlib.animation.specialized import WHITE
 from manimlib.utils.rate_functions import linear
@@ -19,6 +21,14 @@ TEXT_BOX_COLOR = '#111111'
 TEXT_BOX_OPACITY = 1.0
 
 OUTRO_TITLE = 'Outro'
+
+SVG = pathlib.Path('media')
+
+LETTER_ORIGIN = {
+    'f': ORIGIN + LEFT * .4,
+    'd': ORIGIN + RIGHT * .25,
+}
+
 
 def random_point():
     x = random.uniform(X_MIN, X_MAX)
@@ -44,7 +54,7 @@ def get_rocket_path():
 
 class Rocket(SVGMobject):
     CONFIG = {
-        'file_name': 'images/rocket.svg',
+        'file_name': 'rocket.svg',
         'stroke_width': 0,
         'fill_color': '#ffffff',
         'fill_opacity': 1,
@@ -58,11 +68,21 @@ class Rocket(SVGMobject):
 
 class Constellation(SVGMobject):
     CONFIG = {
-        'file_name': 'images/constellation.svg',
+        'file_name': 'constellation.svg',
         'stroke_width': 2,
         'fill_color': '#ffffff',
         'fill_opacity': 1,
         'height': 3,
+    }
+
+
+class License(SVGMobject):
+    CONFIG = {
+        'file_name': 'by-sa.svg',
+        'stroke_width': 1,
+        # 'fill_color': '#000000',
+        'fill_opacity': 1,
+        'height': 2.5,
     }
 
 
@@ -100,8 +120,9 @@ class Intro(Scene):
     }
 
     def create_twinkle_animation(self, run_time: float) -> Animation:
-        twinkle_overlay = ImageMobject('images/overlay-tiled.png')
+        twinkle_overlay = ImageMobject('overlay-tiled.png')
         twinkle_overlay.scale(15)
+        # self.add(twinkle_overlay)
 
         twinkle_down_line = Line(ORIGIN + UP, ORIGIN, stroke_color='#00aa00', stroke_opacity=0.5)
 
@@ -139,6 +160,8 @@ class Intro(Scene):
             for _ in range(star_count)
         ]
 
+        self.stars = stars
+
         return [
             MoveAlongPath(
                 star,
@@ -173,7 +196,6 @@ class Intro(Scene):
 
         rocket.rotate(rocket_path.get_angle() - PI / 2)
 
-
         conference_name = TextMobject(
             os.environ.get('TALK_CONFERENCE', 'hackumenta'),
             height=0.5,
@@ -197,14 +219,17 @@ class Intro(Scene):
         conference_slogan.to_corner(corner=RIGHT + UP)
 
         if is_outro:
-            run_time = 6.0
 
-            license_image = ImageMobject('images/by-sa.png')
-            license_text = TextMobject('CC-BY-SA 4.0', height=0.3)
-            license_text.shift(DOWN * 1.5)
+            license_image = ImageMobject('by-sa.png', height=0.8)
+            license_text = TextMobject('CC-BY-SA 4.0', height=0.2)
+            license_image.shift(DOWN * 2.8)
+            license_text.shift(DOWN * 3.7)
 
+            run_time = 8.5
             circling_animations = self.create_circling_animations(star_count, run_time)
             twinkle_animation = self.create_twinkle_animation(run_time)
+
+            circle_write, fd_write, circle_transform = self.get_fd_circle_animations()
 
             self.play(
                 *circling_animations,
@@ -212,19 +237,34 @@ class Intro(Scene):
                 LaggedStart(
                     Succession(
                         AnimationGroup(
-                            FadeIn(license_image),
-                            FadeIn(license_text),
-                            run_time=1.0,
+                            FadeIn(license_image, run_time=2),
+                            FadeIn(license_text, run_time=3),
+                            circle_write,
+                            fd_write,
+                            run_time=3,
                         ),
-                        AnimationGroup(run_time=0.5),
-                        FadeOutAndShift(conference_slogan, direction=0.2 * LEFT, run_time=0.4, lag_ratio=0.05, rate_func=rush_from),
-                        FadeOutAndShift(conference_name, direction=0.2 * LEFT, run_time=0.4, lag_ratio=0.05, rate_func=rush_from),
-                        AnimationGroup(run_time=0.5),
+                        circle_transform,
+                        AnimationGroup(run_time=1),
+                        # AnimationGroup(
+                        #     FadeOut(license_image),
+                        #     FadeOut(license_text),
+                        #     # FadeOut(constellation),
+                        #     # *[FadeOut(star) for star in self.stars],
+                        #     run_time=0.5,
+                        # ),
+                        AnimationGroup(
+                            FadeOutAndShift(conference_slogan, direction=0.2 * LEFT, run_time=0.5, lag_ratio=0.05,
+                                            rate_func=rush_from),
+                            FadeOutAndShift(conference_name, direction=0.2 * LEFT, run_time=0.5, lag_ratio=0.05,
+                                            rate_func=rush_from),
+                            run_time=1,
+                        ),
                         AnimationGroup(
                             FadeOut(license_image),
                             FadeOut(license_text),
-                            run_time=1.0,
+                            run_time=1,
                         ),
+                        AnimationGroup(run_time=1),
                     ),
                     lag_ratio=0.4,
                 ),
@@ -255,3 +295,40 @@ class Intro(Scene):
                     lag_ratio=0.5,
                 ),
             )
+
+    def get_fd_circle_animations(self, origin=ORIGIN, *args, **kwargs):
+        circle = self.load_fd_circle('circle', origin=origin)
+        circle_dent = self.load_fd_circle('circle_dent', origin=origin)
+        letter_f = self.load_fd_letter('f', origin=origin)
+        letter_d = self.load_fd_letter('d', origin=origin)
+
+        # group both letters together, so the "Write()" animation works smoothly
+        letters = VMobject()
+        letters.add(letter_f)
+        letters.add(letter_d)
+
+        return (
+            Write(circle, stroke_width=7.5, run_time=3),
+            Write(letters, run_time=3,),
+            Transform(circle, circle_dent, run_time=1.5),
+        )
+
+    def fade_out(self, *args, **kwargs):
+        self.play(*[FadeToColor(x, self.camera_config['background_color'], **kwargs) for x in args if x is not None])
+
+    def load_fd_circle(self, filename, origin=ORIGIN) -> SVGMobject:
+        obj = SVGMobject(file_name=str(SVG / f'{filename}.svg'))
+        obj.set_width(2.8)
+        obj.set_stroke('#f6c600', width=7.5)
+        obj.set_fill('#000000', 0)
+        obj.move_to(origin)
+        return obj
+
+    def load_fd_letter(self, letter, origin=ORIGIN) -> SVGMobject:
+        obj = SVGMobject(file_name=str(SVG / f'letter_{letter}.svg'))
+        height = 1.1
+        obj.set_height(height)
+        obj.move_to(LETTER_ORIGIN[letter] + origin)
+        obj.set_stroke('#f6c600', width=1)
+        obj.set_fill('#f6c600')
+        return obj
