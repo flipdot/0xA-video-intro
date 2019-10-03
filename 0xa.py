@@ -221,9 +221,9 @@ class Intro(Scene):
         if is_outro:
 
             license_image = ImageMobject('images/by-sa.png', height=0.8)
-            license_text = TextMobject('CC-BY-SA 4.0', height=0.2)
-            license_image.shift(DOWN * 2.8)
-            license_text.shift(DOWN * 3.7)
+            # license_text = TextMobject('CC-BY-SA 4.0', height=0.2)
+            license_image.shift(DOWN * 2.5)
+            # license_text.shift(DOWN * 3.7)
 
             run_time = 8.5
             circling_animations = self.create_circling_animations(star_count, run_time)
@@ -238,7 +238,7 @@ class Intro(Scene):
                     Succession(
                         AnimationGroup(
                             FadeIn(license_image, run_time=2),
-                            FadeIn(license_text, run_time=3),
+                            # FadeIn(license_text, run_time=3),
                             circle_write,
                             fd_write,
                             run_time=3,
@@ -261,7 +261,7 @@ class Intro(Scene):
                         ),
                         AnimationGroup(
                             FadeOut(license_image),
-                            FadeOut(license_text),
+                            # FadeOut(license_text),
                             run_time=1,
                         ),
                         AnimationGroup(run_time=1),
