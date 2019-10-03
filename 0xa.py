@@ -68,7 +68,7 @@ class Rocket(SVGMobject):
 
 class Constellation(SVGMobject):
     CONFIG = {
-        'file_name': 'constellation.svg',
+        'file_name': 'images/constellation.svg',
         'stroke_width': 2,
         'fill_color': '#ffffff',
         'fill_opacity': 1,
@@ -78,7 +78,7 @@ class Constellation(SVGMobject):
 
 class License(SVGMobject):
     CONFIG = {
-        'file_name': 'by-sa.svg',
+        'file_name': 'images/by-sa.svg',
         'stroke_width': 1,
         # 'fill_color': '#000000',
         'fill_opacity': 1,
@@ -120,7 +120,7 @@ class Intro(Scene):
     }
 
     def create_twinkle_animation(self, run_time: float) -> Animation:
-        twinkle_overlay = ImageMobject('overlay-tiled.png')
+        twinkle_overlay = ImageMobject('images/overlay-tiled.png')
         twinkle_overlay.scale(15)
         # self.add(twinkle_overlay)
 
@@ -220,7 +220,7 @@ class Intro(Scene):
 
         if is_outro:
 
-            license_image = ImageMobject('by-sa.png', height=0.8)
+            license_image = ImageMobject('images/by-sa.png', height=0.8)
             license_text = TextMobject('CC-BY-SA 4.0', height=0.2)
             license_image.shift(DOWN * 2.8)
             license_text.shift(DOWN * 3.7)
@@ -317,7 +317,7 @@ class Intro(Scene):
         self.play(*[FadeToColor(x, self.camera_config['background_color'], **kwargs) for x in args if x is not None])
 
     def load_fd_circle(self, filename, origin=ORIGIN) -> SVGMobject:
-        obj = SVGMobject(file_name=str(SVG / f'{filename}.svg'))
+        obj = SVGMobject(file_name=f'images/{filename}.svg')
         obj.set_width(2.8)
         obj.set_stroke('#f6c600', width=7.5)
         obj.set_fill('#000000', 0)
@@ -325,7 +325,7 @@ class Intro(Scene):
         return obj
 
     def load_fd_letter(self, letter, origin=ORIGIN) -> SVGMobject:
-        obj = SVGMobject(file_name=str(SVG / f'letter_{letter}.svg'))
+        obj = SVGMobject(file_name=f'images/letter_{letter}.svg')
         height = 1.1
         obj.set_height(height)
         obj.move_to(LETTER_ORIGIN[letter] + origin)
