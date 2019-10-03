@@ -1,0 +1,21 @@
+dist: bionic
+language: python
+python:
+  - "3.7"
+
+install:
+  - docker pull nikeee/manim-flipdot
+
+script:
+  - docker run --rm -it -v $(pwd):/root --entrypoint /root/run.sh nikeee/manim-flipdot
+  - mkdir build
+  - mv index.html videos/*/1080p60/*.mp4 build
+
+deploy:
+  provider: pages
+  local_dir: build
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  keep_history: false
+  on:
+    branch: master

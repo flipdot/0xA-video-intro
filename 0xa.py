@@ -1,0 +1,257 @@
+from manimlib.imports import *
+from manimlib.animation.specialized import WHITE
+from manimlib.utils.rate_functions import linear
+import random
+import os
+from typing import List
+
+DEBUG = False
+
+X_MIN = -7
+X_MAX = 8
+Y_MIN = -4
+Y_MAX = 5
+
+STAR_RADIUS = 14
+STAR_CENTER = np.random.normal(0, [3, 5, 0], 3)
+
+TEXT_BOX_COLOR = '#111111'
+TEXT_BOX_OPACITY = 1.0
+
+OUTRO_TITLE = 'Outro'
+
+def random_point():
+    x = random.uniform(X_MIN, X_MAX)
+    y = random.uniform(Y_MIN, Y_MAX)
+
+    return np.array((x, y, 0.))
+
+
+def random_star_size():
+    return np.random.normal(0.02, 0.005)
+
+
+def get_star_count():
+    return int(np.random.normal(240, 50))
+
+
+def get_rocket_path():
+    start = BOTTOM + 4 * DOWN + np.random.normal(0, [FRAME_X_RADIUS, 0, 0], 3)
+    center = np.random.normal(0, [1, 1, 0], 3)
+    end = start + (1 + 1.5 * np.random.rand()) * (center - start)
+    return Line(start, end, stroke_color='#00ffff', stroke_opacity=0.5)
+
+
+class Rocket(SVGMobject):
+    CONFIG = {
+        'file_name': 'images/rocket.svg',
+        'stroke_width': 0,
+        'fill_color': '#ffffff',
+        'fill_opacity': 1,
+        'height': 0.5,
+    }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.submobjects[3].set_fill('#000000', 1)
+
+
+class Constellation(SVGMobject):
+    CONFIG = {
+        'file_name': 'images/constellation.svg',
+        'stroke_width': 2,
+        'fill_color': '#ffffff',
+        'fill_opacity': 1,
+        'height': 3,
+    }
+
+
+class TalkInfo(VMobject):
+    def __init__(self, speaker, title):
+        VMobject.__init__(self)
+
+        session_title = TextMobject(title, height=0.4)
+        session_title.shift(2 * DOWN)
+        session_title.align_to(np.array((X_MAX - 2, 0, 0)), direction=RIGHT)
+        session_title.add_background_rectangle(
+            color=TEXT_BOX_COLOR,
+            buff=0.15,
+            opacity=TEXT_BOX_OPACITY,
+        )
+        self.session_title = session_title
+
+        session_speaker = TextMobject(speaker, height=0.2)
+        session_speaker.shift(3 * DOWN + np.array((0.0, 0.4, 0.0)))
+        session_speaker.align_to(np.array((X_MAX - 2, 0, 0)), direction=RIGHT)
+        session_speaker.shift(0.05 * LEFT)
+        session_speaker.add_background_rectangle(
+            color=TEXT_BOX_COLOR,
+            buff=0.2,
+            opacity=TEXT_BOX_OPACITY,
+        )
+        self.session_speaker = session_speaker
+
+
+class Intro(Scene):
+    CONFIG = {
+        'camera_config': {
+            'background_color': '#030303' if DEBUG else '#000000'
+        }
+    }
+
+    def create_twinkle_animation(self, run_time: float) -> Animation:
+        twinkle_overlay = ImageMobject('images/overlay-tiled.png')
+        twinkle_overlay.scale(15)
+
+        twinkle_down_line = Line(ORIGIN + UP, ORIGIN, stroke_color='#00aa00', stroke_opacity=0.5)
+
+        if DEBUG:
+            self.add(twinkle_down_line)
+
+        return MoveAlongPath(twinkle_overlay, twinkle_down_line, run_time=run_time, rate_func=linear)
+
+    def create_circling_animations(self, star_count: int, run_time: float) -> List[Animation]:
+        orbits = [
+            Arc(
+                radius=(i / star_count) * STAR_RADIUS,
+                arc_center=STAR_CENTER,
+                # only for debug relevant
+                stroke_color='#aa0000',
+                stroke_opacity=0.5,
+                # Stars at the outside should make shorter distances than those in the middle
+                angle=(TAU / (run_time + (i / run_time))) * np.random.rand(),
+                start_angle=TAU * np.random.rand(),
+            )
+            for i in range(star_count)
+        ]
+
+        if DEBUG:
+            for orbit in orbits:
+                # orbit.rotate(PI * np.random.uniform(0, 360))
+                self.add(orbit)
+
+        stars = [
+            Dot(
+                radius=random_star_size(),
+                color=WHITE,
+                fill=WHITE,
+            )
+            for _ in range(star_count)
+        ]
+
+        return [
+            MoveAlongPath(
+                star,
+                orbit,
+                rate_func=linear,
+                run_time=run_time,
+            )
+            for star, orbit in zip(stars, orbits)
+        ]
+
+    def construct(self):
+        talk_speaker = os.environ.get('TALK_SPEAKER', 'Frank Nord')
+        talk_title = os.environ.get('TALK_TITLE', 'Debugging down in the deep web')
+        is_outro = talk_speaker == OUTRO_TITLE and talk_title == OUTRO_TITLE
+
+        seed = os.environ.get('SEED', None)
+        if seed is not None:
+            print(f'Using seed: {seed}')
+        np.random.seed(int(seed) if seed else None)
+
+        star_count = get_star_count()
+
+        constellation = Constellation()
+        constellation.move_to(np.array((-4, 0, 0)))
+
+        self.add(constellation)
+        rocket = Rocket(height=np.random.normal(3, 1))
+
+        rocket_path = get_rocket_path()
+        if DEBUG:
+            self.add(rocket_path)
+
+        rocket.rotate(rocket_path.get_angle() - PI / 2)
+
+
+        conference_name = TextMobject(
+            os.environ.get('TALK_CONFERENCE', 'hackumenta'),
+            height=0.5,
+        )
+        conference_name.add_background_rectangle(
+            color=TEXT_BOX_COLOR,
+            buff=0.25,
+            opacity=TEXT_BOX_OPACITY,
+        )
+        conference_name.to_corner(corner=LEFT + UP)
+
+        conference_slogan = TextMobject(
+            os.environ.get('TALK_CONFERENCE_SLOGAN', '10 years in space'),
+            height=0.3,
+        )
+        conference_slogan.add_background_rectangle(
+            color=TEXT_BOX_COLOR,
+            buff=0.15,
+            opacity=TEXT_BOX_OPACITY,
+        )
+        conference_slogan.to_corner(corner=RIGHT + UP)
+
+        if is_outro:
+            run_time = 6.0
+
+            license_image = ImageMobject('images/by-sa.png')
+            license_text = TextMobject('CC-BY-SA 4.0', height=0.3)
+            license_text.shift(DOWN * 1.5)
+
+            circling_animations = self.create_circling_animations(star_count, run_time)
+            twinkle_animation = self.create_twinkle_animation(run_time)
+
+            self.play(
+                *circling_animations,
+                twinkle_animation,
+                LaggedStart(
+                    Succession(
+                        AnimationGroup(
+                            FadeIn(license_image),
+                            FadeIn(license_text),
+                            run_time=1.0,
+                        ),
+                        AnimationGroup(run_time=0.5),
+                        FadeOutAndShift(conference_slogan, direction=0.2 * LEFT, run_time=0.4, lag_ratio=0.05, rate_func=rush_from),
+                        FadeOutAndShift(conference_name, direction=0.2 * LEFT, run_time=0.4, lag_ratio=0.05, rate_func=rush_from),
+                        AnimationGroup(run_time=0.5),
+                        AnimationGroup(
+                            FadeOut(license_image),
+                            FadeOut(license_text),
+                            run_time=1.0,
+                        ),
+                    ),
+                    lag_ratio=0.4,
+                ),
+            )
+
+        else:
+            run_time = 10.0
+            circling_animations = self.create_circling_animations(star_count, run_time)
+            twinkle_animation = self.create_twinkle_animation(run_time)
+
+            rocket_animation = MoveAlongPath(rocket, rocket_path, run_time=run_time, rate_func=linear)
+
+            talk_info = TalkInfo(talk_speaker, talk_title)
+            talk_info_animation = LaggedStart(
+                FadeInFrom(talk_info.session_title, 0.1 * LEFT, run_time=3.5, lag_ratio=0.7, rate_func=smooth),
+                FadeInFrom(talk_info.session_speaker, 0.1 * LEFT, run_time=2.0, lag_ratio=0.9, rate_func=smooth),
+                lag_ratio=0.1,
+            )
+
+            self.play(
+                *circling_animations,
+                twinkle_animation,
+                rocket_animation,
+                LaggedStart(
+                    FadeInFrom(conference_name, 0.1 * LEFT, run_time=1.5, lag_ratio=0.2, rate_func=slow_into),
+                    FadeInFrom(conference_slogan, 0.1 * LEFT, run_time=2.0, lag_ratio=0.6, rate_func=slow_into),
+                    talk_info_animation,
+                    lag_ratio=0.5,
+                ),
+            )

@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+
+import os
+import re
+import subprocess
+import random
+from textwrap import dedent
+from collections import namedtuple
+import urllib.parse
+from multiprocessing import Pool
+from multiprocessing import cpu_count
+
+Talk = namedtuple('Talk', ['speaker', 'title', 'seed'])
+
+TALKS = {
+    Talk('aiko', 'Die dreckige Empirie', None),
+    # Talk('typ_o', 'Chemie und Physik beim Kochen und Brot backen', None),
+    Talk('Sven', 'Esperanto: Wie funktioniert eine Plansprache?', None),
+    # Talk('nikeee', 'Wie zählt man bei Twitter die Seitenaufrufe?', None),
+    Talk('nikeee', 'Was andere Sprachen von TypeScript lernen können', None),
+    # Talk('dargmuesli', 'Dargstack: Ein Strauß Microservices', None),
+    Talk('BinaerBube', 'Mechanische Zeichenmaschine - Generative Kunst mit Arduino und Stepper', None),
+    Talk('Outro', 'Outro', None),
+}
+
+def sanitize_file_name(file_name: str) -> str:
+    '''
+    Ref: https://stackoverflow.com/a/13593932
+    '''
+    return re.sub('[^\w\-_\. ]', '_', file_name)
+
+
+def render_talk(p):
+    speaker, title, seed = p
+
+    env = os.environ.copy()
+    env['TALK_CONFERENCE'] = 'hackumenta'
+    env['TALK_SPEAKER'] = speaker
+    env['TALK_TITLE'] = title
+    env['SEED'] = str(seed) if seed is not None else str(random.randint(0, 1000000))
+
+    file_name_title = title.replace(' ', '.')
+    file_name = sanitize_file_name(f'{speaker}-{file_name_title}-{env["SEED"]}.mp4')
+
+    print(f'Rendering: {speaker}_{title}')
+
+    p = subprocess.Popen([
+            'manim',
+            '--file_name', file_name,
+            '-r', '1080,1920',
+            '0xa.py',
+            'Intro',
+        ],
+        env=env,
+    )
+    p.wait()
+    return (Talk(speaker, title, seed), file_name)
+
+def render_talks(talks):
+    pool = Pool(cpu_count())
+    files = pool.map(render_talk, TALKS)
+    pool.close()
+    pool.join()
+    return files
+
+def main():
+    files = render_talks(TALKS)
+
+    with open('index.html', 'w') as index_html:
+
+        links = ''.join(map(
+            lambda file: f'<li><a href="{urllib.parse.quote(file[1])}">{file[0].speaker} - {file[0].title}</a>',
+            files
+        ))
+
+        index_html.write(
+            dedent(
+                f'''\
+                <!doctype html>
+                <meta charset=utf-8>
+                <h1>Intros</h1>
+                <ul>
+                {links}
+                </ul>
+                '''
+            )
+        )
+
+
+if __name__ == '__main__':
+    main()
