@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="22.737627mm"
+   height="45.475258mm"
+   viewBox="0 0 22.737627 45.475258"
+   version="1.1"
+   id="svg8">
+  <defs
+     id="defs2" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     transform="translate(-93.063313,-67.261341)">
+    <g
+       aria-label="fd"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       id="text816">
+      <path
+         d="m 93.063313,89.998972 c 0,-1.653646 0.401928,-3.180972 1.205784,-4.581977 1.722547,-3.008717 4.352305,-4.513075 7.889273,-4.513075 h 9.09505 V 69.535104 c 0,-1.515842 0.75792,-2.273763 2.27376,-2.273763 1.51584,0 2.27376,0.757921 2.27376,2.273763 v 40.927736 c 0,1.51584 -0.75792,2.27376 -2.27376,2.27376 h -11.36881 c -2.549374,0 -4.708302,-0.87276 -6.476784,-2.61827 -1.745515,-1.76848 -2.618273,-3.92741 -2.618273,-6.47678 0,-4.547526 0,-13.642578 0,-13.642578 z m 9.095057,-4.547526 c -0.3158,0 -2.342671,0.447862 -3.238394,1.343587 -0.872758,0.872757 -1.309137,1.940737 -1.309137,3.203939 v 13.642578 c 0,1.24023 0.447863,2.30821 1.343588,3.20394 0.895722,0.89573 1.963703,1.34359 3.203943,1.34359 h 9.09505 V 85.451446 c 0,0 -8.77924,0 -9.09505,0 z"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:70.55555725px;font-family:ISOCPEUR;-inkscape-font-specification:ISOCPEUR;letter-spacing:-2.83633304px;fill:#000000;fill-opacity:1;stroke-width:0.26458332"
+         id="path821" />
+    </g>
+  </g>
+</svg>
