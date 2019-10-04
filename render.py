@@ -14,10 +14,11 @@ TALKS = {
     Talk('aiko', 'Die dreckige Empirie', None),
     # Talk('typ_o', 'Chemie und Physik beim Kochen und Brot backen', None),
     Talk('Sven', 'Esperanto: Wie funktioniert eine Plansprache?', None),
-    # Talk('nikeee', 'Wie zählt man bei Twitter die Seitenaufrufe?', None),
+    # Talk('nikeee', 'Wie zählt man bei $BIG_SITE die Seitenaufrufe?', None),
     Talk('nikeee', 'Was andere Sprachen von TypeScript lernen können', None),
     # Talk('dargmuesli', 'Dargstack: Ein Strauß Microservices', None),
-    Talk('BinaerBube', 'Mechanische Zeichenmaschine - Generative Kunst mit Arduino und Stepper', None),
+    Talk('BinaerBube', 'Mechanische Zeichenmaschine', None),
+    # Talk('BinaerBube', 'Mechanische Zeichenmaschine - Generative Kunst mit Arduino und Stepper', None),  # Title too long
     Talk('Outro', 'Outro', None),
 }
 
