@@ -54,7 +54,7 @@ def get_rocket_path():
 
 class Rocket(SVGMobject):
     CONFIG = {
-        'file_name': 'rocket.svg',
+        'file_name': 'images/rocket.svg',
         'stroke_width': 0,
         'fill_color': '#ffffff',
         'fill_opacity': 1,
