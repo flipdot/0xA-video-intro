@@ -11,22 +11,36 @@ import urllib.parse
 Talk = namedtuple('Talk', ['speaker', 'title', 'seed'])
 
 TALKS = {
+    # Day 0
+    Talk('AI', 'Opening', None),
+    Talk('dargmuesli', 'CUDA Basics', None),
     Talk('aiko', 'Die dreckige Empirie', None),
-    # Talk('typ_o', 'Chemie und Physik beim Kochen und Brot backen', None),
-    Talk('Sven', 'Esperanto: Wie funktioniert eine Plansprache?', None),
-    # Talk('nikeee', 'Wie zählt man bei $BIG_SITE die Seitenaufrufe?', None),
-    Talk('nikeee', 'Was andere Sprachen von TypeScript lernen können', None),
-    # Talk('dargmuesli', 'Dargstack: Ein Strauß Microservices', None),
+    # Talk('typ_o', 'flipdot - was bisher geschah', None),
+
+    # Day 1
     Talk('BinaerBube', 'Mechanische Zeichenmaschine', None),
-    # Talk('BinaerBube', 'Mechanische Zeichenmaschine - Generative Kunst mit Arduino und Stepper', None),  # Title too long
+    Talk('nikeee', 'Was andere Sprachen von TypeScript lernen können', None),
+    Talk('typ_o', 'Chemie und Physik beim Kochen und Brot backen', None),
+    Talk('unsurv', 'Biometrische Überwachung in Deutschland', None),
+
+    # Day 2
+    Talk('dargmuesli', 'DargStack: Ein Strauß Microservices', None),
+    Talk('Antares', 'Blast Procedure – Wie man Party und Videogames vereinen kann', None),
+    Talk('Sven', 'Esperanto: Wie funktioniert eine Plansprache?', None),
+    Talk('nikeee', 'Wie zählt man bei $BIG_SITE die Seitenaufrufe?', None),
+    Talk('analogmultiplizierer', 'flipdot Badge PCB Design', None),
+    Talk('DmB', 'Diskordischer Göttinendienst', None),
+
     Talk('Outro', 'Outro', None),
 }
+
 
 def sanitize_file_name(file_name: str) -> str:
     '''
     Ref: https://stackoverflow.com/a/13593932
     '''
     return re.sub('[^\w\-_\. ]', '_', file_name)
+
 
 def render_talks(talks):
     files = []
@@ -47,12 +61,13 @@ def render_talks(talks):
         print(f'Rendering: {speaker}_{title}')
 
         p = subprocess.Popen([
-                'manim',
-                '--file_name', file_name,
-                '-r', '1080,1920',
-                '0xa.py',
-                'Intro',
-            ],
+            'manim',
+            '--file_name', file_name,
+            # '-r', '1080,1920',
+            '-l',
+            '0xa.py',
+            'Intro',
+        ],
             env=env,
         )
         p.wait()
@@ -64,7 +79,6 @@ def main():
     files = render_talks(TALKS)
 
     with open('index.html', 'w') as index_html:
-
         links = ''.join(map(
             lambda file: f'<li><a href="{urllib.parse.quote(file[1])}">{file[0].speaker} - {file[0].title}</a>',
             files
