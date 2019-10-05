@@ -63,8 +63,8 @@ def render_talks(talks):
         p = subprocess.Popen([
             'manim',
             '--file_name', file_name,
-            # '-r', '1080,1920',
-            '-l',
+            '-r', '1080,1920',
+            # '-l',
             '0xa.py',
             'Intro',
         ],
