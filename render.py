@@ -27,7 +27,7 @@ TALKS = {
     Talk('dargmuesli', 'DargStack: Ein Strauß Microservices', None),
     Talk('Antares', 'Blast Procedure – Wie man Party und Videogames vereinen kann', None),
     Talk('Sven', 'Esperanto: Wie funktioniert eine Plansprache?', None),
-    Talk('nikeee', 'Wie zählt man bei $BIG_SITE die Seitenaufrufe?', None),
+    Talk('nikeee', 'Wie zählt man bei \$BIG\_SITE die Seitenaufrufe?', None),
     Talk('analogmultiplizierer', 'flipdot Badge PCB Design', None),
     Talk('DmB', 'Diskordischer Göttinendienst', None),
 
