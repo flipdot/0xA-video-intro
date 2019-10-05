@@ -12,7 +12,7 @@ Talk = namedtuple('Talk', ['speaker', 'title', 'seed'])
 
 TALKS = {
     # Day 0
-    Talk('AI', 'Opening', None),
+    Talk('AI', 'Opening', '717855'),
     Talk('dargmuesli', 'CUDA Basics', None),
     Talk('aiko', 'Die dreckige Empirie', None),
     # Talk('typ_o', 'flipdot - was bisher geschah', None),
@@ -29,7 +29,7 @@ TALKS = {
     Talk('Sven', 'Esperanto: Wie funktioniert eine Plansprache?', None),
     Talk('nikeee', 'Wie zählt man bei \$BIG\_SITE die Seitenaufrufe?', None),
     Talk('analogmultiplizierer', 'flipdot Badge PCB Design', None),
-    Talk('DmB', 'Diskordischer Göttinendienst', None),
+    # Talk('DmB', 'Diskordischer Göttinendienst', None),
 
     Talk('Outro', 'Outro', None),
 }
