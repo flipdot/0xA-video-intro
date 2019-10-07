@@ -12,26 +12,26 @@ Talk = namedtuple('Talk', ['speaker', 'title', 'seed'])
 
 TALKS = {
     # Day 0
-    Talk('AI', 'Opening', '717855'),
-    Talk('dargmuesli', 'CUDA Basics', None),
-    Talk('aiko', 'Die dreckige Empirie', None),
+    Talk('soerface / AI', 'Opening', '717855'),
+    Talk('dargmuesli', 'CUDA Basics', '83634'),
+    Talk('aiko', 'Die dreckige Empirie', '960604'),
     # Talk('typ_o', 'flipdot - was bisher geschah', None),
 
     # Day 1
-    Talk('BinaerBube', 'Mechanische Zeichenmaschine', None),
-    Talk('nikeee', 'Was andere Sprachen von TypeScript lernen können', None),
-    Talk('typ_o', 'Chemie und Physik beim Kochen und Brot backen', None),
-    Talk('unsurv', 'Biometrische Überwachung in Deutschland', None),
+    Talk('BinaerBube', 'Mechanische Zeichenmaschine', '1000'),
+    Talk('nikeee', 'Was andere Sprachen von TypeScript lernen können', '882746'),
+    Talk('typ\_o', 'Chemie und Physik beim Kochen und Brot backen', '879286'),
+    Talk('unsurv', 'Biometrische Überwachung in Deutschland', '497125'),
 
     # Day 2
-    Talk('dargmuesli', 'DargStack: Ein Strauß Microservices', None),
-    Talk('Antares', 'Blast Procedure – Wie man Party und Videogames vereinen kann', None),
-    Talk('Sven', 'Esperanto: Wie funktioniert eine Plansprache?', None),
-    Talk('nikeee', 'Wie zählt man bei \$BIG\_SITE die Seitenaufrufe?', None),
-    Talk('analogmultiplizierer', 'flipdot Badge PCB Design', None),
+    Talk('dargmuesli', 'DargStack: Ein Strauß Microservices', '187721'),
+    Talk('Antares', 'Blast Procedure - Wie man Party und Videogames vereinen kann', '449339'),
+    Talk('Sven', 'Esperanto: Wie funktioniert eine Plansprache?', '563460'),
+    Talk('nikeee', 'Wie zählt man bei \$BIG\_SITE die Seitenaufrufe?', '519098'),
+    Talk('analogmultiplizierer', 'flipdot Badge PCB Design', '600089'),
     # Talk('DmB', 'Diskordischer Göttinendienst', None),
 
-    Talk('Outro', 'Outro', None),
+    Talk('Outro', 'Outro', '545513'),
 }
 
 
