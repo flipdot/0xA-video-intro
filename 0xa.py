@@ -285,7 +285,7 @@ class Intro(Scene):
                 NEW_ROCKET_EVERY_N_SECONDS = 60
                 rockets = [
                     self.create_rocket_with_path(min_length=2.3, max_length=4)
-                    for _ in range(int(run_time // NEW_ROCKET_EVERY_N_SECONDS))
+                    for _ in range(int(run_time // NEW_ROCKET_EVERY_N_SECONDS) + 1)
                 ]
                 rocket_animations = [MoveAlongPath(r, p, run_time=NEW_ROCKET_EVERY_N_SECONDS, rate_func=linear) for r, p in rockets]
                 self.play(
