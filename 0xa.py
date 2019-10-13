@@ -9,6 +9,11 @@ from typing import List
 
 DEBUG = False
 
+seed = os.environ.get('SEED', None)
+if seed is not None:
+    print(f'Using seed: {seed}')
+np.random.seed(int(seed) if seed else None)
+
 X_MIN = -7
 X_MAX = 8
 Y_MIN = -4
@@ -21,6 +26,7 @@ TEXT_BOX_COLOR = '#111111'
 TEXT_BOX_OPACITY = 1.0
 
 OUTRO_TITLE = 'Outro'
+BACKGROUND_TITLE = 'Background'
 
 SVG = pathlib.Path('media')
 
@@ -175,12 +181,8 @@ class Intro(Scene):
     def construct(self):
         talk_speaker = os.environ.get('TALK_SPEAKER', 'Frank Nord')
         talk_title = os.environ.get('TALK_TITLE', 'Debugging down in the deep web')
-        is_outro = talk_speaker == OUTRO_TITLE and talk_title == OUTRO_TITLE
-
-        seed = os.environ.get('SEED', None)
-        if seed is not None:
-            print(f'Using seed: {seed}')
-        np.random.seed(int(seed) if seed else None)
+        is_outro = talk_speaker == talk_title == OUTRO_TITLE
+        is_background = talk_speaker == talk_title == BACKGROUND_TITLE
 
         star_count = get_star_count()
 
