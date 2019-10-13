@@ -32,13 +32,16 @@ TALKS = {
     # Talk('DmB', 'Diskordischer Göttinendienst', None),
 
     Talk('Outro', 'Outro', '545513'),
+
+    # Takes long to render - set playtime a few lines below
+    # Talk('Background', 'Background', '620613'),
 }
 
 
 def sanitize_file_name(file_name: str) -> str:
-    '''
+    """
     Ref: https://stackoverflow.com/a/13593932
-    '''
+    """
     return re.sub('[^\w\-_\. ]', '_', file_name)
 
 
@@ -51,9 +54,13 @@ def render_talks(talks):
 
         env = os.environ.copy()
         env['TALK_CONFERENCE'] = 'hackumenta'
+        env['TALK_CONFERENCE_SLOGAN'] = '10 years in space'
         env['TALK_SPEAKER'] = speaker
         env['TALK_TITLE'] = title
         env['SEED'] = str(seed) if seed is not None else str(random.randint(0, 1000000))
+        if speaker == title == 'Background':
+            env['RUN_TIME'] = '120'
+            # env['RUN_TIME'] = str(60 * 60 * 2)  # 2 hours of background blinking
 
         file_name_title = title.replace(' ', '.')
         file_name = sanitize_file_name(f'{speaker}-{file_name_title}-{env["SEED"]}.mp4')
@@ -63,8 +70,8 @@ def render_talks(talks):
         p = subprocess.Popen([
             'manim',
             '--file_name', file_name,
-            '-r', '1080,1920',
-            # '-l',
+            # '-r', '1080,1920',
+            '-l',
             '0xa.py',
             'Intro',
         ],
