@@ -9,6 +9,11 @@ from typing import List
 
 DEBUG = False
 
+seed = os.environ.get('SEED', None)
+if seed is not None:
+    print(f'Using seed: {seed}')
+np.random.seed(int(seed) if seed else None)
+
 X_MIN = -7
 X_MAX = 8
 Y_MIN = -4
@@ -21,6 +26,7 @@ TEXT_BOX_COLOR = '#111111'
 TEXT_BOX_OPACITY = 1.0
 
 OUTRO_TITLE = 'Outro'
+BACKGROUND_TITLE = 'Background'
 
 SVG = pathlib.Path('media')
 
@@ -45,10 +51,10 @@ def get_star_count():
     return int(np.random.normal(240, 50))
 
 
-def get_rocket_path():
+def get_rocket_path(min_length=1, max_length=2.5):
     start = BOTTOM + 4 * DOWN + np.random.normal(0, [FRAME_X_RADIUS, 0, 0], 3)
     center = np.random.normal(0, [1, 1, 0], 3)
-    end = start + (1 + 1.5 * np.random.rand()) * (center - start)
+    end = start + (min_length + (max_length - min_length) * np.random.rand()) * (center - start)
     return Line(start, end, stroke_color='#00ffff', stroke_opacity=0.5)
 
 
@@ -124,7 +130,7 @@ class Intro(Scene):
         twinkle_overlay.scale(15)
         # self.add(twinkle_overlay)
 
-        twinkle_down_line = Line(ORIGIN + UP, ORIGIN, stroke_color='#00aa00', stroke_opacity=0.5)
+        twinkle_down_line = Line(ORIGIN + UP * run_time / 10, ORIGIN, stroke_color='#00aa00', stroke_opacity=0.5)
 
         if DEBUG:
             self.add(twinkle_down_line)
@@ -140,7 +146,7 @@ class Intro(Scene):
                 stroke_color='#aa0000',
                 stroke_opacity=0.5,
                 # Stars at the outside should make shorter distances than those in the middle
-                angle=(TAU / (run_time + (i / run_time))) * np.random.rand(),
+                angle=(TAU / (10 + (i / 10))) * np.random.rand() * run_time / 10,
                 start_angle=TAU * np.random.rand(),
             )
             for i in range(star_count)
@@ -172,15 +178,22 @@ class Intro(Scene):
             for star, orbit in zip(stars, orbits)
         ]
 
+    def create_rocket_with_path(self, **kwargs):
+        rocket = Rocket(height=np.random.normal(3, 1))
+
+        rocket_path = get_rocket_path(**kwargs)
+        if DEBUG:
+            self.add(rocket_path)
+
+        rocket.rotate(rocket_path.get_angle() - PI / 2)
+
+        return rocket, rocket_path
+
     def construct(self):
         talk_speaker = os.environ.get('TALK_SPEAKER', 'Frank Nord')
         talk_title = os.environ.get('TALK_TITLE', 'Debugging down in the deep web')
-        is_outro = talk_speaker == OUTRO_TITLE and talk_title == OUTRO_TITLE
-
-        seed = os.environ.get('SEED', None)
-        if seed is not None:
-            print(f'Using seed: {seed}')
-        np.random.seed(int(seed) if seed else None)
+        is_outro = talk_speaker == talk_title == OUTRO_TITLE
+        is_background = talk_speaker == talk_title == BACKGROUND_TITLE
 
         star_count = get_star_count()
 
@@ -188,13 +201,6 @@ class Intro(Scene):
         constellation.move_to(np.array((-4, 0, 0)))
 
         self.add(constellation)
-        rocket = Rocket(height=np.random.normal(3, 1))
-
-        rocket_path = get_rocket_path()
-        if DEBUG:
-            self.add(rocket_path)
-
-        rocket.rotate(rocket_path.get_angle() - PI / 2)
 
         conference_name = TextMobject(
             os.environ.get('TALK_CONFERENCE', 'hackumenta'),
@@ -226,8 +232,8 @@ class Intro(Scene):
             # license_text.shift(DOWN * 3.7)
 
             run_time = 8.5
-            circling_animations = self.create_circling_animations(star_count, run_time)
             twinkle_animation = self.create_twinkle_animation(run_time)
+            circling_animations = self.create_circling_animations(star_count, run_time)
 
             circle_write, fd_write, circle_transform = self.get_fd_circle_animations()
 
@@ -271,30 +277,44 @@ class Intro(Scene):
             )
 
         else:
-            run_time = 10.0
-            circling_animations = self.create_circling_animations(star_count, run_time)
+            run_time = float(os.environ.get('RUN_TIME', '10.0'))
             twinkle_animation = self.create_twinkle_animation(run_time)
+            circling_animations = self.create_circling_animations(star_count, run_time)
 
-            rocket_animation = MoveAlongPath(rocket, rocket_path, run_time=run_time, rate_func=linear)
+            if is_background:
+                NEW_ROCKET_EVERY_N_SECONDS = 60 * 5
+                rockets = [
+                    self.create_rocket_with_path(min_length=2.3, max_length=4)
+                    for _ in range(int(run_time // NEW_ROCKET_EVERY_N_SECONDS) + 1)
+                ]
+                rocket_animations = [MoveAlongPath(r, p, run_time=NEW_ROCKET_EVERY_N_SECONDS, rate_func=linear) for r, p in rockets]
+                self.play(
+                    *circling_animations,
+                    twinkle_animation,
+                    LaggedStart(*rocket_animations, lag_ratio=1)
+                )
+            else:
+                rocket, rocket_path = self.create_rocket_with_path()
+                rocket_animation = MoveAlongPath(rocket, rocket_path, run_time=run_time, rate_func=linear)
 
-            talk_info = TalkInfo(talk_speaker, talk_title)
-            talk_info_animation = LaggedStart(
-                FadeInFrom(talk_info.session_title, 0.1 * LEFT, run_time=3.5, lag_ratio=0.7, rate_func=smooth),
-                FadeInFrom(talk_info.session_speaker, 0.1 * LEFT, run_time=2.0, lag_ratio=0.9, rate_func=smooth),
-                lag_ratio=0.1,
-            )
+                talk_info = TalkInfo(talk_speaker, talk_title)
+                talk_info_animation = LaggedStart(
+                    FadeInFrom(talk_info.session_title, 0.1 * LEFT, run_time=3.5, lag_ratio=0.7, rate_func=smooth),
+                    FadeInFrom(talk_info.session_speaker, 0.1 * LEFT, run_time=2.0, lag_ratio=0.9, rate_func=smooth),
+                    lag_ratio=0.1,
+                )
 
-            self.play(
-                *circling_animations,
-                twinkle_animation,
-                rocket_animation,
-                LaggedStart(
-                    FadeInFrom(conference_name, 0.1 * LEFT, run_time=1.5, lag_ratio=0.2, rate_func=slow_into),
-                    FadeInFrom(conference_slogan, 0.1 * LEFT, run_time=2.0, lag_ratio=0.6, rate_func=slow_into),
-                    talk_info_animation,
-                    lag_ratio=0.5,
-                ),
-            )
+                self.play(
+                    *circling_animations,
+                    twinkle_animation,
+                    rocket_animation,
+                    LaggedStart(
+                        FadeInFrom(conference_name, 0.1 * LEFT, run_time=1.5, lag_ratio=0.2, rate_func=slow_into),
+                        FadeInFrom(conference_slogan, 0.1 * LEFT, run_time=2.0, lag_ratio=0.6, rate_func=slow_into),
+                        talk_info_animation,
+                        lag_ratio=0.5,
+                    ),
+                )
 
     def get_fd_circle_animations(self, origin=ORIGIN, *args, **kwargs):
         circle = self.load_fd_circle('circle', origin=origin)
