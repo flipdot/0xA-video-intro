@@ -282,7 +282,7 @@ class Intro(Scene):
             circling_animations = self.create_circling_animations(star_count, run_time)
 
             if is_background:
-                NEW_ROCKET_EVERY_N_SECONDS = 60
+                NEW_ROCKET_EVERY_N_SECONDS = 60 * 5
                 rockets = [
                     self.create_rocket_with_path(min_length=2.3, max_length=4)
                     for _ in range(int(run_time // NEW_ROCKET_EVERY_N_SECONDS) + 1)
