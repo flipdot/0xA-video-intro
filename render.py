@@ -31,6 +31,9 @@ TALKS = {
     Talk('analogmultiplizierer', 'flipdot Badge PCB Design', '600089'),
     # Talk('DmB', 'Diskordischer Göttinendienst', None),
 
+    # Day 3
+    Talk('nxb', 'Closing', '942175'),
+
     Talk('Outro', 'Outro', '545513'),
 
     # Takes long to render - set playtime a few lines below
